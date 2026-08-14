@@ -51,6 +51,10 @@ public class PuntoAcopio
     [Column("telefono")]
     public string? Telefono { get; set; }
 
+    [MaxLength(500)]
+    [Column("url_flyer")]
+    public string? UrlFlyer { get; set; }  // Imagen del flyer/afiche del punto de acopio
+
     [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
