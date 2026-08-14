@@ -30,8 +30,25 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// ServerVersion.AutoDetect abre una conexion a MySQL. Dentro del lambda de
+// AddDbContext se ejecuta en CADA request (una conexion extra por peticion, y
+// cualquier fallo de credenciales revienta el request entero). Se resuelve una
+// sola vez al arrancar, con fallback para que la app levante aunque la BD falle.
+ServerVersion serverVersion;
+try
+{
+    serverVersion = ServerVersion.AutoDetect(connectionString);
+    Console.WriteLine($"[startup] MySQL detectado: {serverVersion}");
+}
+catch (Exception exVersion)
+{
+    Console.WriteLine($"[startup] No se pudo autodetectar MySQL ({exVersion.GetType().Name}: {exVersion.Message}). Usando 8.0.36 por defecto.");
+    serverVersion = new MySqlServerVersion(new Version(8, 0, 36));
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseMySql(connectionString, serverVersion));
 
 var jwtKey = builder.Configuration["Auth:JwtKey"]
     ?? throw new InvalidOperationException("Auth:JwtKey no configurada");
@@ -116,6 +133,31 @@ app.MapGet("/api/diag/version", () => Results.Ok(new
 app.MapGet("/api/diag/db", async (AppDbContext db) =>
 {
     var resultado = new Dictionary<string, object?>();
+
+    // Cadena de conexion enmascarada: confirma que Railway inyecta la variable
+    // correcta, sin exponer la contrasena.
+    try
+    {
+        var cs = db.Database.GetDbConnection().ConnectionString ?? string.Empty;
+        var partes = cs.Split(';', StringSplitOptions.RemoveEmptyEntries)
+            .Select(par =>
+            {
+                var i = par.IndexOf('=');
+                if (i < 0) return par.Trim();
+                var clave = par[..i].Trim();
+                var valor = par[(i + 1)..].Trim();
+                if (clave.Contains("password", StringComparison.OrdinalIgnoreCase) || clave.Equals("pwd", StringComparison.OrdinalIgnoreCase))
+                    return clave + "=<" + valor.Length + " caracteres>";
+                return clave + "=" + valor;
+            })
+            .ToArray();
+        resultado["cadenaConexion"] = partes;
+    }
+    catch (Exception ex)
+    {
+        resultado["cadenaConexion"] = $"ERROR: {ex.GetType().Name}: {ex.Message}";
+    }
+
     try
     {
         resultado["puedeConectar"] = await db.Database.CanConnectAsync();
