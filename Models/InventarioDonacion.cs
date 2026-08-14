@@ -35,4 +35,3 @@ public class InventarioDonacion
     public PuntoAcopio PuntoAcopio { get; set; } = null!;
     public ICollection<MovimientoDonacion> Movimientos { get; set; } = new List<MovimientoDonacion>();
 }
- 
