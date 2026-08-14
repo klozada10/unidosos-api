@@ -105,7 +105,7 @@ public class AuthController : ControllerBase
         if (username.Length < 3)
             return BadRequest(new { mensaje = "El nombre de usuario debe tener mínimo 3 caracteres" });
 
-        // Verificar punto de acopio solo si se indicó
+        // Verificar punto de acopio existente si se indicó
         Models.PuntoAcopio? punto = null;
         if (dto.PuntoAcopioId.HasValue)
         {
@@ -119,6 +119,21 @@ public class AuthController : ControllerBase
         if (existe)
             return Conflict(new { mensaje = $"El usuario '{username}' ya existe. Elige otro nombre de usuario." });
 
+        // Si va a crear su propio punto de acopio, crearlo primero
+        if (!dto.PuntoAcopioId.HasValue && !string.IsNullOrWhiteSpace(dto.NombrePuntoNuevo))
+        {
+            punto = new Models.PuntoAcopio
+            {
+                Nombre = dto.NombrePuntoNuevo.Trim(),
+                Direccion = string.IsNullOrWhiteSpace(dto.DireccionPunto) ? "Por confirmar" : dto.DireccionPunto.Trim(),
+                Barrio = dto.BarrioPunto?.Trim(),
+                Ciudad = string.IsNullOrWhiteSpace(dto.CiudadPunto) ? "Colombia" : dto.CiudadPunto.Trim(),
+                Activo = true
+            };
+            _context.PuntosAcopio.Add(punto);
+            await _context.SaveChangesAsync();
+        }
+
         // Crear voluntario
         var voluntario = new Models.Voluntario
         {
@@ -126,10 +141,14 @@ public class AuthController : ControllerBase
             Apellido = dto.Apellido.Trim(),
             Apodo = string.IsNullOrWhiteSpace(dto.Apodo) ? dto.Nombre.Trim() : dto.Apodo.Trim(),
             Telefono = dto.Telefono?.Trim(),
-            PuntoAcopioId = dto.PuntoAcopioId,
+            PuntoAcopioId = punto?.Id,
             Activo = true
         };
         _context.Voluntarios.Add(voluntario);
+        await _context.SaveChangesAsync();
+
+        // Asignar código secuencial (001, 002, … 999)
+        voluntario.Codigo = voluntario.Id.ToString("D3");
         await _context.SaveChangesAsync();
 
         // Crear acceso
