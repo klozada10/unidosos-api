@@ -11,6 +11,7 @@ public class PuntoAcopioDto
     public string HorarioFin { get; set; } = string.Empty;
     public string? Descripcion { get; set; }
     public string? Telefono { get; set; }
+    public string? UrlFlyer { get; set; }   // Imagen del flyer
     public List<VoluntarioDto> Voluntarios { get; set; } = new();
     public List<ItemNecesarioDto> ItemsNecesarios { get; set; } = new();
 }
@@ -22,6 +23,7 @@ public class VoluntarioDto
     public string Apellido { get; set; } = string.Empty;
     public string? Apodo { get; set; }
     public string? Telefono { get; set; }
+    public string? Codigo { get; set; }     // Código público del influencer (ej: "001")
 }
 
 public class ItemNecesarioDto
