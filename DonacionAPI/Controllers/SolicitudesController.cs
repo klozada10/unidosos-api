@@ -82,7 +82,7 @@ public class SolicitudesController : ControllerBase
     /// Llamar después de crear la solicitud
     /// </summary>
     [HttpPost("{id}/fotos")]
-    public async Task<ActionResult> SubirFotos(int id, [List<IFormFile>] IFormFileCollection fotos)
+    public async Task<ActionResult> SubirFotos(int id, List<IFormFile> fotos)
     {
         var solicitud = await _context.SolicitudesAyuda
             .Include(s => s.Fotos)
