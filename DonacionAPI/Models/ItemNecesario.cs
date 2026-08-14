@@ -34,3 +34,4 @@ public class ItemNecesario
     // Navegación
     public PuntoAcopio PuntoAcopio { get; set; } = null!;
 }
+ 
