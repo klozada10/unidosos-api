@@ -62,3 +62,4 @@ public class SolicitudAyuda
     // Navegación
     public ICollection<FotoSolicitud> Fotos { get; set; } = new List<FotoSolicitud>();
 }
+ 
