@@ -21,9 +21,6 @@ public class PuntosAcopioController : ControllerBase
         _env = env;
     }
 
-    /// <summary>
-    /// Obtiene todos los puntos de acopio activos
-    /// </summary>
     [HttpGet]
     public async Task<IActionResult> GetPuntos()
     {
@@ -49,9 +46,6 @@ public class PuntosAcopioController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Endpoint para probar conexión a BD
-    /// </summary>
     [HttpGet("test")]
     public async Task<IActionResult> Test()
     {
@@ -74,17 +68,9 @@ public class PuntosAcopioController : ControllerBase
             });
         }
     }
-    [HttpGet("ping-2026")]
-public IActionResult Ping2026()
-{
-    return Ok("PING FUNCIONA");
-}
 
-    /// <summary>
-    /// Obtiene un punto por ID
-    /// </summary>
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<PuntoAcopioDto>> GetPunto(int id)
+    public async Task<IActionResult> GetPunto(int id)
     {
         try
         {
@@ -95,10 +81,12 @@ public IActionResult Ping2026()
                 .FirstOrDefaultAsync();
 
             if (punto == null)
+            {
                 return NotFound(new
                 {
                     mensaje = "Punto de acopio no encontrado"
                 });
+            }
 
             return Ok(MapToDto(punto));
         }
@@ -112,5 +100,75 @@ public IActionResult Ping2026()
             });
         }
     }
-    
+
+    [HttpPost]
+    public async Task<ActionResult<PuntoAcopioDto>> CreatePunto(
+        [FromBody] CreatePuntoAcopioDto dto)
+    {
+        try
+        {
+            var punto = new PuntoAcopio
+            {
+                Nombre = dto.Nombre,
+                Direccion = dto.Direccion,
+                Barrio = dto.Barrio,
+                Ciudad = dto.Ciudad,
+                HorarioInicio = TimeSpan.Parse(dto.HorarioInicio),
+                HorarioFin = TimeSpan.Parse(dto.HorarioFin),
+                Descripcion = dto.Descripcion,
+                Telefono = dto.Telefono
+            };
+
+            _context.PuntosAcopio.Add(punto);
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(
+                nameof(GetPunto),
+                new { id = punto.Id },
+                MapToDto(punto));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                mensaje = ex.Message,
+                detalle = ex.InnerException?.Message
+            });
+        }
+    }
+
+    private static PuntoAcopioDto MapToDto(PuntoAcopio p) => new()
+    {
+        Id = p.Id,
+        Nombre = p.Nombre,
+        Direccion = p.Direccion,
+        Barrio = p.Barrio,
+        Ciudad = p.Ciudad,
+        HorarioInicio = p.HorarioInicio.ToString(@"hh\:mm"),
+        HorarioFin = p.HorarioFin.ToString(@"hh\:mm"),
+        Descripcion = p.Descripcion,
+        Telefono = p.Telefono,
+        UrlFlyer = p.UrlFlyer,
+
+        Voluntarios = p.Voluntarios.Select(v => new VoluntarioDto
+        {
+            Id = v.Id,
+            Nombre = v.Nombre,
+            Apellido = v.Apellido,
+            Apodo = v.Apodo,
+            Telefono = v.Telefono,
+            Codigo = v.Codigo
+        }).ToList(),
+
+        ItemsNecesarios = p.ItemsNecesarios
+            .Select(i => new ItemNecesarioDto
+            {
+                Id = i.Id,
+                Nombre = i.Nombre,
+                Descripcion = i.Descripcion,
+                Prioridad = i.Prioridad
+            })
+            .ToList()
+    };
 }
