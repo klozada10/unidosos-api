@@ -89,6 +89,77 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Registro de nuevo voluntario con su propia contraseña
+    /// </summary>
+    [HttpPost("registro")]
+    public async Task<ActionResult<LoginResponseDto>> RegistrarVoluntario([FromBody] RegistroVoluntarioDto dto)
+    {
+        // Validaciones básicas
+        if (string.IsNullOrWhiteSpace(dto.Nombre) || string.IsNullOrWhiteSpace(dto.Apellido))
+            return BadRequest(new { mensaje = "Nombre y apellido son obligatorios" });
+
+        if (dto.Password.Length < 8)
+            return BadRequest(new { mensaje = "La contraseña debe tener mínimo 8 caracteres" });
+
+        var username = dto.Username.ToLower().Trim();
+        if (username.Length < 3)
+            return BadRequest(new { mensaje = "El nombre de usuario debe tener mínimo 3 caracteres" });
+
+        // Verificar que el punto de acopio existe
+        var punto = await _context.PuntosAcopio.FindAsync(dto.PuntoAcopioId);
+        if (punto == null)
+            return BadRequest(new { mensaje = "Punto de acopio no válido" });
+
+        // Verificar que el username no esté tomado
+        var existe = await _context.VoluntariosAcceso.AnyAsync(a => a.Username == username);
+        if (existe)
+            return Conflict(new { mensaje = $"El usuario '{username}' ya existe. Elige otro nombre de usuario." });
+
+        // Crear voluntario
+        var voluntario = new Models.Voluntario
+        {
+            Nombre = dto.Nombre.Trim(),
+            Apellido = dto.Apellido.Trim(),
+            Apodo = string.IsNullOrWhiteSpace(dto.Apodo) ? dto.Nombre.Trim() : dto.Apodo.Trim(),
+            Telefono = dto.Telefono?.Trim(),
+            PuntoAcopioId = dto.PuntoAcopioId,
+            Activo = true
+        };
+        _context.Voluntarios.Add(voluntario);
+        await _context.SaveChangesAsync();
+
+        // Crear acceso
+        var acceso = new Models.VoluntarioAcceso
+        {
+            VoluntarioId = voluntario.Id,
+            Username = username,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password, workFactor: 11),
+            EsSuperAdmin = false,
+            Activo = true
+        };
+        _context.VoluntariosAcceso.Add(acceso);
+        await _context.SaveChangesAsync();
+
+        // Cargar relaciones para el token
+        acceso.Voluntario = voluntario;
+        voluntario.PuntoAcopio = punto;
+
+        var token = GenerarToken(acceso);
+        return Ok(new LoginResponseDto
+        {
+            Token = token,
+            Username = acceso.Username,
+            NombreCompleto = $"{voluntario.Nombre} {voluntario.Apellido}",
+            Apodo = voluntario.Apodo,
+            EsSuperAdmin = false,
+            VoluntarioId = voluntario.Id,
+            PuntoAcopioId = voluntario.PuntoAcopioId,
+            NombrePunto = punto.Nombre,
+            Expiracion = DateTime.UtcNow.AddDays(7)
+        });
+    }
+
+    /// <summary>
     /// Verificar que el token aún es válido (para el frontend al recargar)
     /// </summary>
     [HttpGet("verify")]
