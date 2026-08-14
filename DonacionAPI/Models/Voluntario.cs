@@ -11,7 +11,7 @@ public class Voluntario
     public int Id { get; set; }
 
     [Column("punto_acopio_id")]
-    public int PuntoAcopioId { get; set; }
+    public int? PuntoAcopioId { get; set; }
 
     [Required]
     [MaxLength(100)]
@@ -31,6 +31,10 @@ public class Voluntario
     [Column("telefono")]
     public string? Telefono { get; set; }
 
+    [MaxLength(10)]
+    [Column("codigo")]
+    public string? Codigo { get; set; }  // Ej: "001", "042" — código público del influencer
+
     [Column("activo")]
     public bool Activo { get; set; } = true;
 
@@ -38,5 +42,5 @@ public class Voluntario
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navegación
-    public PuntoAcopio PuntoAcopio { get; set; } = null!;
+    public PuntoAcopio? PuntoAcopio { get; set; }
 }
