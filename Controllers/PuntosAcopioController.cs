@@ -74,6 +74,11 @@ public class PuntosAcopioController : ControllerBase
             });
         }
     }
+    [HttpGet("ping-2026")]
+public IActionResult Ping2026()
+{
+    return Ok("PING FUNCIONA");
+}
 
     /// <summary>
     /// Obtiene un punto por ID
@@ -107,4 +112,5 @@ public class PuntosAcopioController : ControllerBase
             });
         }
     }
+    
 }
