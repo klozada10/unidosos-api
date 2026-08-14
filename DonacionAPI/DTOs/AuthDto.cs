@@ -32,7 +32,16 @@ public class RegistroVoluntarioDto
     public string Apellido { get; set; } = string.Empty;
     public string? Apodo { get; set; }
     public string Telefono { get; set; } = string.Empty;
-    public int? PuntoAcopioId { get; set; }  // Opcional — el voluntario puede crear su propio punto después
+
+    // Si se une a un punto ya existente:
+    public int? PuntoAcopioId { get; set; }
+
+    // Si va a crear su propio punto durante el registro:
+    public string? NombrePuntoNuevo { get; set; }
+    public string? DireccionPunto { get; set; }
+    public string? BarrioPunto { get; set; }
+    public string? CiudadPunto { get; set; }
+
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
 }
