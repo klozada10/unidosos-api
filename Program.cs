@@ -69,6 +69,11 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors();
+// ↓ Agregar esto:
+app.UseExceptionHandler(h => h.Run(async ctx => {
+    ctx.Response.StatusCode = 500;
+    await ctx.Response.WriteAsJsonAsync(new { mensaje = "Error interno" });
+}));
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -64,8 +64,8 @@ public class PuntosAcopioController : ControllerBase
             Direccion = dto.Direccion,
             Barrio = dto.Barrio,
             Ciudad = dto.Ciudad,
-            HorarioInicio = TimeOnly.Parse(dto.HorarioInicio),
-            HorarioFin = TimeOnly.Parse(dto.HorarioFin),
+            HorarioInicio = TimeSpan.Parse(dto.HorarioInicio),
+            HorarioFin = TimeSpan.Parse(dto.HorarioFin),
             Descripcion = dto.Descripcion,
             Telefono = dto.Telefono
         };
@@ -190,8 +190,8 @@ public class PuntosAcopioController : ControllerBase
         Direccion = p.Direccion,
         Barrio = p.Barrio,
         Ciudad = p.Ciudad,
-        HorarioInicio = p.HorarioInicio.ToString("HH:mm"),
-        HorarioFin = p.HorarioFin.ToString("HH:mm"),
+        HorarioInicio = p.HorarioInicio.ToString(@"hh\:mm"),
+        HorarioFin = p.HorarioFin.ToString(@"hh\:mm"),
         Descripcion = p.Descripcion,
         Telefono = p.Telefono,
         UrlFlyer = p.UrlFlyer,

@@ -30,10 +30,10 @@ public class PuntoAcopio
     public string Ciudad { get; set; } = "Cali";
 
     [Column("horario_inicio")]
-    public TimeOnly HorarioInicio { get; set; } = new TimeOnly(8, 0);
+     public TimeSpan HorarioInicio { get; set; } = new TimeSpan(8, 0, 0);
 
     [Column("horario_fin")]
-    public TimeOnly HorarioFin { get; set; } = new TimeOnly(18, 0);
+     public TimeSpan HorarioFin { get; set; } = new TimeSpan(18, 0, 0);
 
     [Column("descripcion")]
     public string? Descripcion { get; set; }
