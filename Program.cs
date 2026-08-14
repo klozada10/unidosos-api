@@ -89,10 +89,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseCors(); // ← PRIMERO para que el preflight OPTIONS nunca sea redirigido
 app.UseStaticFiles();
-app.UseCors();
-app.UseAuthentication(); // ← ANTES de Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
