@@ -56,7 +56,7 @@ public class AuthController : ControllerBase
             Apodo = acceso.Voluntario.Apodo,
             EsSuperAdmin = acceso.EsSuperAdmin,
             VoluntarioId = acceso.VoluntarioId,
-            PuntoAcopioId = acceso.Voluntario.PuntoAcopioId,
+            PuntoAcopioId = acceso.Voluntario.PuntoAcopioId ?? 0,
             NombrePunto = acceso.Voluntario.PuntoAcopio?.Nombre ?? "",
             Expiracion = DateTime.UtcNow.AddDays(7)
         });
@@ -205,7 +205,7 @@ public class AuthController : ControllerBase
             new Claim(ClaimTypes.NameIdentifier, acceso.Id.ToString()),
             new Claim(ClaimTypes.Name, acceso.Username),
             new Claim("VoluntarioId", acceso.VoluntarioId.ToString()),
-            new Claim("PuntoAcopioId", acceso.Voluntario.PuntoAcopioId.ToString()),
+            new Claim("PuntoAcopioId", (acceso.Voluntario.PuntoAcopioId ?? 0).ToString()),
             new Claim("NombreCompleto", $"{acceso.Voluntario.Nombre} {acceso.Voluntario.Apellido}"),
             new Claim("Apodo", acceso.Voluntario.Apodo ?? acceso.Voluntario.Nombre),
             new Claim("EsSuperAdmin", acceso.EsSuperAdmin.ToString()),
