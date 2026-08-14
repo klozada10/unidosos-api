@@ -23,5 +23,16 @@ public class SetupPasswordDto
 {
     public string Username { get; set; } = string.Empty;
     public string NuevaPassword { get; set; } = string.Empty;
-    public string CodigoAdmin { get; set; } = string.Empty; // Código secreto para primer setup
+    public string CodigoAdmin { get; set; } = string.Empty;
+}
+
+public class RegistroVoluntarioDto
+{
+    public string Nombre { get; set; } = string.Empty;
+    public string Apellido { get; set; } = string.Empty;
+    public string? Apodo { get; set; }
+    public string Telefono { get; set; } = string.Empty;
+    public int PuntoAcopioId { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }
