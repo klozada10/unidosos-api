@@ -38,3 +38,4 @@ public class VoluntarioAcceso
     // Navegación
     public Voluntario Voluntario { get; set; } = null!;
 }
+ 
