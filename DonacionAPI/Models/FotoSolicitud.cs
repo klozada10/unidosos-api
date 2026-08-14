@@ -28,3 +28,4 @@ public class FotoSolicitud
     // Navegación
     public SolicitudAyuda Solicitud { get; set; } = null!;
 }
+
