@@ -105,10 +105,14 @@ public class AuthController : ControllerBase
         if (username.Length < 3)
             return BadRequest(new { mensaje = "El nombre de usuario debe tener mínimo 3 caracteres" });
 
-        // Verificar que el punto de acopio existe
-        var punto = await _context.PuntosAcopio.FindAsync(dto.PuntoAcopioId);
-        if (punto == null)
-            return BadRequest(new { mensaje = "Punto de acopio no válido" });
+        // Verificar punto de acopio solo si se indicó
+        Models.PuntoAcopio? punto = null;
+        if (dto.PuntoAcopioId.HasValue)
+        {
+            punto = await _context.PuntosAcopio.FindAsync(dto.PuntoAcopioId.Value);
+            if (punto == null)
+                return BadRequest(new { mensaje = "Punto de acopio no válido" });
+        }
 
         // Verificar que el username no esté tomado
         var existe = await _context.VoluntariosAcceso.AnyAsync(a => a.Username == username);
@@ -140,7 +144,6 @@ public class AuthController : ControllerBase
         _context.VoluntariosAcceso.Add(acceso);
         await _context.SaveChangesAsync();
 
-        // Cargar relaciones para el token
         acceso.Voluntario = voluntario;
         voluntario.PuntoAcopio = punto;
 
@@ -153,8 +156,8 @@ public class AuthController : ControllerBase
             Apodo = voluntario.Apodo,
             EsSuperAdmin = false,
             VoluntarioId = voluntario.Id,
-            PuntoAcopioId = voluntario.PuntoAcopioId,
-            NombrePunto = punto.Nombre,
+            PuntoAcopioId = voluntario.PuntoAcopioId ?? 0,
+            NombrePunto = punto?.Nombre ?? "Sin punto asignado",
             Expiracion = DateTime.UtcNow.AddDays(7)
         });
     }
