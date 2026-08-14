@@ -30,3 +30,4 @@ public class MovimientoDonacion
     // Navegación
     public InventarioDonacion Inventario { get; set; } = null!;
 }
+ 
