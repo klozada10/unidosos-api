@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using DonacionAPI.Data;
+using DonacionAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,8 +51,26 @@ catch (Exception exVersion)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, serverVersion));
 
-var jwtKey = builder.Configuration["Auth:JwtKey"]
-    ?? throw new InvalidOperationException("Auth:JwtKey no configurada");
+// Almacenamiento de imagenes (flyers). Si no hay credenciales de Cloudinary
+// la app arranca igual y los endpoints de subida responden 503.
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IImagenService, CloudinaryService>();
+
+// Ojo: "??" solo salta con null. Una cadena vacia lo atravesaba y despues
+// reventaba dentro de SymmetricSecurityKey con "key length is zero", que es
+// un 500 imposible de diagnosticar. Se valida tambien el vacio y la longitud
+// minima que exige HMAC-SHA256 (32 bytes).
+var jwtKey = builder.Configuration["Auth:JwtKey"];
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    throw new InvalidOperationException(
+        "Auth:JwtKey no configurada. Definela como variable de entorno Auth__JwtKey.");
+}
+if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
+{
+    throw new InvalidOperationException(
+        "Auth:JwtKey es demasiado corta: HMAC-SHA256 exige al menos 32 caracteres.");
+}
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

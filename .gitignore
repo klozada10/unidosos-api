@@ -1,0 +1,20 @@
+# ── Compilación de .NET ──────────────────────────────
+bin/
+obj/
+*.user
+*.suo
+
+# ── Copias antiguas del proyecto ─────────────────────
+backend-v5/
+_to_delete/
+
+# ── Configuración local con secretos ─────────────────
+appsettings.Development.json
+appsettings.Local.json
+
+# ── Sistema operativo / editores ─────────────────────
+.vs/
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

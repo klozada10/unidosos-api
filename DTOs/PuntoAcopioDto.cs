@@ -45,3 +45,21 @@ public class CreatePuntoAcopioDto
     public string? Descripcion { get; set; }
     public string? Telefono { get; set; }
 }
+
+/// <summary>
+/// Edicion parcial de un punto de acopio: todo es opcional y solo se
+/// aplican los campos que lleguen con valor. El flyer no va aqui, se
+/// gestiona con POST/DELETE /api/puntosacopio/{id}/flyer.
+/// </summary>
+public class UpdatePuntoAcopioDto
+{
+    public string? Nombre { get; set; }
+    public string? Direccion { get; set; }
+    public string? Barrio { get; set; }
+    public string? Ciudad { get; set; }
+    public string? HorarioInicio { get; set; }
+    public string? HorarioFin { get; set; }
+    public string? Descripcion { get; set; }
+    public string? Telefono { get; set; }
+    public bool? Activo { get; set; }
+}

@@ -196,7 +196,10 @@ public class AuthController : ControllerBase
     // ───────────────────────────────────────────────────────
     private string GenerarToken(Models.VoluntarioAcceso acceso)
     {
-        var jwtKey = _config["Auth:JwtKey"] ?? throw new InvalidOperationException("JWT Key no configurada");
+        var jwtKey = _config["Auth:JwtKey"];
+        if (string.IsNullOrWhiteSpace(jwtKey))
+            throw new InvalidOperationException("Auth:JwtKey no configurada");
+
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

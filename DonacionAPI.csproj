@@ -7,6 +7,22 @@
     <RootNamespace>DonacionAPI</RootNamespace>
   </PropertyGroup>
 
+  <!--
+    Los proyectos SDK compilan TODOS los .cs que cuelgan de la carpeta.
+    Estas carpetas contienen copias antiguas del proyecto y provocarian
+    errores de tipos duplicados (CS0101 / CS0111 / CS8802).
+  -->
+  <ItemGroup>
+    <Compile Remove="backend-v5/**" />
+    <Compile Remove="_to_delete/**" />
+    <Content Remove="backend-v5/**" />
+    <Content Remove="_to_delete/**" />
+    <None Remove="backend-v5/**" />
+    <None Remove="_to_delete/**" />
+    <EmbeddedResource Remove="backend-v5/**" />
+    <EmbeddedResource Remove="_to_delete/**" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0" />
